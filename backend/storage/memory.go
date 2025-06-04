@@ -5,7 +5,8 @@ import (
 )
 
 var (
-	Users   = map[string]models.User{}
-	Tweets  = []models.Tweet{}
-	Follows = []models.Follow{}
+	Users = map[string]models.User{}
+	// Tweets indexados por user_id
+	TweetsByUser = map[string][]models.Tweet{}
+	Follows      = []models.Follow{}
 )
