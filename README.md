@@ -1,188 +1,184 @@
-# Challenge técnico para la empresa Ualá.
+# Technical Challenge for Ualá
 
->  **TvitterUala - plataforma de microblogging similar a twitter**
-## Arquitectura y Componentes
+> **TvitterUala – a microblogging platform similar to Twitter**
 
-- **Lenguaje:** Go
-- **Framework:** Fiber 
-- **Estructura:** Separación en capas (`main.go`, `models`, `handlers`, `storage`)
-- **Almacenamiento:** En memoria (mapas y slices)
-- **Endpoints REST:** Para usuarios, tweets, follows y timeline
-- **Documentación:** Este README describe la arquitectura, componentes y uso
+## Architecture and Components
 
-## Descripción
+- **Language:** Go  
+- **Framework:** Fiber  
+- **Structure:** Layered separation (`main.go`, `models`, `handlers`, `storage`)  
+- **Storage:** In-memory (maps and slices)  
+- **REST Endpoints:** For users, tweets, follows, and timeline  
+- **Documentation:** This README describes the architecture, components, and usage  
 
-TvitterUala es una aplicación de ejemplo que simula una versión simple de Twitter. Permite a los usuarios:
-- Crear una cuenta de usuario.
-- Publicar mensajes cortos llamados "tweets".
-- Seguir a otros usuarios.
-- Ver un timeline con los tweets propios y de las personas que siguen.
+## Description
 
-El backend está desarrollado en Go usando el framework Fiber. Todos los datos se almacenan en memoria (no se guardan en disco).
+TvitterUala is a sample application that simulates a simple version of Twitter. It allows users to:  
+- Create a user account  
+- Post short messages called "tweets"  
+- Follow other users  
+- View a timeline with their own tweets and tweets from users they follow  
+
+The backend is developed in Go using the Fiber framework. All data is stored in memory (no disk persistence).  
 
 ---
 
-## Estructura del Proyecto
+## Project Structure
 
-```
 backend/
 │
-├── main.go                  # Inicializa el servidor y define las rutas principales
+├── main.go # Initializes the server and defines main routes
 ├── models/
-│     └── models.go          # Modelos de datos: User, Tweet, Follow
+│ └── models.go # Data models: User, Tweet, Follow
 ├── handlers/
-│     └── tweet_handlers.go  # Lógica de los endpoints (usuarios, tweets, follow, timeline)
+│ └── tweet_handlers.go # Endpoint logic (users, tweets, follow, timeline)
 ├── storage/
-│     └── memory.go          # Almacenamiento en memoria (usuarios, follows, tweets indexados)
-```
+│ └── memory.go # In-memory storage (users, follows, indexed tweets)
+
 
 ---
 
-## ¿Cómo funciona?
+## How does it work?
 
-### 1. Crear usuario
+### 1. Create User
 
-Permite registrar un nuevo usuario.
+Allows registering a new user.
 
-- **Método:** POST
-- **Ruta:** `/users`
-- **Body de ejemplo:**
+- **Method:** POST  
+- **Route:** `/users`  
+- **Example request body:**
   ```json
   {
-    "id": "usuario1",
-    "name": "Nombre"
+    "id": "user1",
+    "name": "Name"
   }
-  ```
-- **Respuesta de ejemplo:**
-  ```json
-  {
-    "id": "usuario1",
-    "name": "Nombre"
-  }
-  ```
 
----
+    Example response:
 
-### 2. Publicar tweet
+    {
+      "id": "user1",
+      "name": "Name"
+    }
 
-Permite a un usuario publicar un mensaje corto (máximo 280 caracteres).
+2. Post Tweet
 
-- **Método:** POST
-- **Ruta:** `/tweets`
-- **Body de ejemplo:**
-  ```json
-  {
-    "user_id": "usuario1",
-    "text": "Hola mundo"
-  }
-  ```
-- **Respuesta de ejemplo:**
-  ```json
-  {
-    "id": "uuid-generado",
-    "user_id": "usuario1",
-    "text": "Hola mundo",
-    "timestamp": "2024-06-01T12:34:56.789Z"
-  }
-  ```
+Allows a user to post a short message (max 280 characters).
 
----
+    Method: POST
 
-### 3. Seguir usuario
+    Route: /tweets
 
-Permite a un usuario seguir a otro.
+    Example request body:
 
-- **Método:** POST
-- **Ruta:** `/follow`
-- **Body de ejemplo:**
-  ```json
-  {
-    "follower_id": "usuario1",
-    "followee_id": "usuario2"
-  }
-  ```
-- **Respuesta de ejemplo:**
-  ```json
-  {
-    "message": "followed"
-  }
-  ```
+{
+  "user_id": "user1",
+  "text": "Hello world"
+}
 
----
+Example response:
 
-### 4. Ver timeline
+    {
+      "id": "generated-uuid",
+      "user_id": "user1",
+      "text": "Hello world",
+      "timestamp": "2024-06-01T12:34:56.789Z"
+    }
 
-Devuelve los tweets del usuario y de las personas que sigue, ordenados del más reciente al más antiguo.  
-Soporta paginación para no devolver demasiados tweets de una sola vez.
+3. Follow User
 
-- **Método:** GET
-- **Ruta:** `/timeline?user_id=usuario1&page=1&size=10`
-  - `user_id`: ID del usuario que consulta su timeline (obligatorio)
-  - `page`: número de página (opcional, por defecto 1)
-  - `size`: cantidad de tweets por página (opcional, por defecto 10)
-- **Respuesta de ejemplo:**
-  ```json
-  {
-    "page": 1,
-    "size": 10,
-    "total": 3,
-    "timeline": [
-      {
-        "id": "uuid1",
-        "user_id": "usuario2",
-        "text": "Tweet de usuario2",
-        "timestamp": "2024-06-01T12:34:56.789Z"
-      },
-      {
-        "id": "uuid2",
-        "user_id": "usuario1",
-        "text": "Mi propio tweet",
-        "timestamp": "2024-06-01T12:30:00.000Z"
-      }
-    ]
-  }
-  ```
-  - El timeline incluye los tweets del usuario y de quienes sigue, ordenados del más reciente al más antiguo.
-  - Puedes cambiar la página y el tamaño usando los parámetros `page` y `size`.
+Allows a user to follow another user.
 
----
+    Method: POST
 
-## ¿Cómo se almacenan los datos?
+    Route: /follow
 
-- **Usuarios:**  
-  Se guardan en memoria en un mapa (clave: ID de usuario).
+    Example request body:
 
-- **Tweets:**  
-  Se guardan en memoria, indexados por usuario, para que sea rápido buscar los tweets de cada uno.
+{
+  "follower_id": "user1",
+  "followee_id": "user2"
+}
 
-- **Follows:**  
-  Se guarda una lista de quién sigue a quién.
+Example response:
 
-> **Nota:** Si apagas el servidor, se pierden todos los datos porque no se usan bases de datos.
+    {
+      "message": "followed"
+    }
 
----
+4. View Timeline
 
-## ¿Cómo ejecutar el backend?
+Returns tweets from the user and the users they follow, ordered from newest to oldest.
+Supports pagination to avoid returning too many tweets at once.
 
-1. Instala las dependencias:
-   ```sh
-   go mod tidy
-   ```
+    Method: GET
 
-2. Ejecuta el backend:
-   ```sh
-   go run main.go
-   ```
+    Route: /timeline?user_id=user1&page=1&size=10
 
-3. Se pueden probar los endpoints usando Postman, curl o cualquier cliente HTTP.
+        user_id: ID of the user requesting their timeline (required)
 
----
+        page: page number (optional, default 1)
 
-## Ejemplo de flujo completo
+        size: number of tweets per page (optional, default 10)
 
-1. Crear dos usuarios (`usuario1` y `usuario2`).
-2. `usuario1` sigue a `usuario2`.
-3. Ambos publican tweets.
-4. Consultar el timeline de `usuario1` mostrará sus propios tweets y los de `usuario2`.
+    Example response:
+
+    {
+      "page": 1,
+      "size": 10,
+      "total": 3,
+      "timeline": [
+        {
+          "id": "uuid1",
+          "user_id": "user2",
+          "text": "Tweet from user2",
+          "timestamp": "2024-06-01T12:34:56.789Z"
+        },
+        {
+          "id": "uuid2",
+          "user_id": "user1",
+          "text": "My own tweet",
+          "timestamp": "2024-06-01T12:30:00.000Z"
+        }
+      ]
+    }
+
+        The timeline includes tweets from the user and those they follow, ordered newest to oldest.
+
+        You can change the page and size using the page and size parameters.
+
+How is data stored?
+
+    Users:
+    Stored in memory in a map (key: user ID).
+
+    Tweets:
+    Stored in memory, indexed by user for quick lookup.
+
+    Follows:
+    Stored as a list of who follows whom.
+
+    Note: Data is lost if the server stops because no database is used.
+
+How to run the backend?
+
+    Install dependencies:
+
+go mod tidy
+
+Run the backend:
+
+    go run main.go
+
+    You can test the endpoints using Postman, curl, or any HTTP client.
+
+Full example flow
+
+    Create two users (user1 and user2).
+
+    user1 follows user2.
+
+    Both post tweets.
+
+    Querying user1’s timeline will show their own tweets and those of user2.
 
 ---
